@@ -362,61 +362,169 @@ To create a swap space :
 
 ---
 
+### LVM
+
+*Refer to book*
+
+## How the Kernel Boots
+
+> The machine’s BIOS or boot firmware loads and runs a boot loader.
+> The boot loader finds the kernel image on disk, loads it into memory,and starts it.
+> The kernel initializes the devices and its drivers.
+> The kernel mounts the root filesystem.
+> The kernel starts a program called init with a process ID of 1. This point is the user space start.
+> init sets the rest of the system processes in motion.
+> At some point, init starts a process allowing you to log in, usually at the end or near the end of the boot sequence.
+
+journalctl -k : To view the log info for boot processes.
+
+### Kernel Initilization and Boot Options
+
+> CPU inspection
+> Memory inspection
+> Device bus discovery
+> Device discovery
+> Auxiliary kernel subsystem setup (networking and the like)
+> Root filesystem mount
+> User space start
+
+cat /proc/cmdline : shows the kernel parameters.
+> BOOT_IMAGE=/boot/vmlinuz-7.0.0-15-generic root=UUID=b505e7b9-56be-415e-806e-731c50c312bc ro quiet splash crashkernel=2G-4G:320M,4G-32G:512M,32G-64G:1024M,64G-128G:2048M,128G-:4096M
+
+splash is for displaying splash screen , root is for the location of the root filesystem. It can be specified as a uuid, device file or logical volume.  
 
 
+### Boot Loaders 
+
+eg Bios, Efi , Uefi. 
+efibootmgr : If you get a list of boot targets, your system has UEFI. If instead you’re told that EFI variables aren’t supported, your system uses a BIOS.
+
+Job is to load the kernel from device into memory with the kernel parameters. 
+The kernel and it's parameters are usually somewhere on the rootfs.
+This is where the chicken and egg problem starts.
+
+### Boot loader tasks
+
+> Select from multiple kernels.
+> Switch between sets of kernel parameters.
+> Allow the user to manually override and edit kernel image names and parameters (for example, to enter single-user mode).
+> Provide support for booting other operating systems.
+
+### Grub
+
+Grand Unified Boot Loader
+
+filesystem navigation that allows for easy kernel image and configuration selection.  
+
+e : view bootloader config info
+
+/boot : contains boot files eg vmlinuz(kernel) and initrd(initial ram filesystem)
+
+#### Exploring Grub
+
+c : enters the grub cli and allows one to run commands like
+ls (-l) : list devices grub has found. hd0, hd1 for disks found
+echo $root: where grub expects to find the kernel
+ls ($root)/ : list files and dirs in that directory
+set : views the current grub parameters
+boot : boot with the variables above
+esc : return to boot menu
+
+#### Grub config file
+
+/boot/grub : contains all grub related info
+grub.cfg : central config file
+grub-mkconfig : edit the grub config file
+
+To edit the grub cfg : create your own config in /boot/grub/custom.cfg
+grub-mkconfig -o /boot/grub/grub.cfg : to generate new grub config file. Always backup old first
+
+#### Install grub
+
+*Refer to book on page 131*
+
+Secure boot : requires that the bootloader to be digitally signed , if not it wont be loaded. Linux already has signed bootloaders so no problem.
+However if one creates a custom grub and is dual booting with windows, it can cause issues since windows may not run without secure boot.
+
+Uefi supports multiple boot loaders in the efi partition. This is called **chainloading** which allows one to use a different bootloader on different partitions. 
+
+## How User Space Starts
+
+User space starts in roughly this order:
+
+init process(lauched by the kernel)
+Essential low-level services, such as udevd and syslogd
+Network configuration
+Mid- and high-level services (cron, printing, and so on)
+Login prompts, GUIs, and high-level applications, such as web servers
+
+### Init
+
+Resides in /sbin : start and stop essential services on the system
+On most distors this will be the **systemd** 
+Its basically a series of scripts that run in sequence one at a time .
+
+### Systemd
+
+More advanced init process. It loads units(scripts for some system task ) when they are needed instead of one at a time like trad init.
+
+> Service units   Control the service daemons found on a Unix system.
+> Target units   Control other units, usually by grouping them.
+> Socket units   Represent incoming network connection request locations.
+> Mount units   Represent the attachment of filesystems to the system.
+
+When boot finishes it activates a default init eg default.target
+
+Two main systemd config files:
+
+/lib/systemd/system : contains system unit config files. **Dont change this dir**
+/etc/sytemd/system : system config dir. Can be changed.  
+
+systemctl -p UnitPath show : systemd search path
+pkg-config systemd --variable=systemdsystemunitdir : system unit dirs
+pkg-config systemd --variable=systemdsystemconfdir : system config dir
+
+#### Unit files
+
+Have a particular format.
+
+The [Unit] section gives some details about the unit and contains description and dependency information.
+[Service] section, includes how to prepare, start, and reload the service
+
+A **specifier** is a variable-like feature often found in unit files. Specifiers start with a percent sign (%). For example, the %n specifier is the current unit name, and the %H specifier is the current hostname.
+When activating a service from a unit file with instances, systemd replaces the %I or %i specifier with the instance to create the new service name.
 
 
+#### systemctl
+systemctl - used to interact with services
 
+systemctl list-units (--full for long unit names , --all for all units ) : views all active units
 
+systemctl status servicename : shows status of a service and recent logs
+journalctl --unit=unitname : view all logs for a unit 
 
+systemctl (start , stop , restart) to manage services
+systemctl reload unit : reload config file
+systemctl daemon-reload  : reload all config files
+systemctl list-jobs : shows jobs aka systemctl requests
 
+**Adding jobs to systemd**
 
+Put them in /etc/systemd/system
+*refer to pages 146 to 161*
 
+### Initial Ram File System
 
+Stored as a cpio archive
+initrd - older and uses disk images
 
+Upon start, the kernel reads the contents of the archive into a temporary RAM filesystem (the init-ramfs), mounts it at /, and performs the user-mode handoff to the init on
+the initramfs. Then, the utilities included in the initramfs allow the kernel to load the necessary driver modules for the real root filesystem. Finally, the
+utilities mount the real root filesystem and start the true init.
 
+mkinitramfs and dracut : used to create initramfs file.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## SYSTEM CONFIGURATION:LOGGING, SYSTEM TIME, BATCH JOBS, AND USERS
 
 
 
