@@ -526,8 +526,71 @@ mkinitramfs and dracut : used to create initramfs file.
 
 ## SYSTEM CONFIGURATION:LOGGING, SYSTEM TIME, BATCH JOBS, AND USERS
 
+journald : a utility provided by sytemd for logging
+journalctl : used to view log information
+/var/log : contains log files for different stuff
+/var/log/journal/ : where journald stores it's binary log files
+journalctl_PID=1234 : view logs for process with id 1234
 
+journalctl -s -4h : view logs for the last 4hrs
+> journalctl -S 06:00:00
+> journalctl -S 2020-01-14
+> journalctl -S '2020-01-14 14:30:00'
 
+journalctl -u service : shows the log files for a particular service
+journalctl -b : logs for the current boot eg from when it started to when it stopped
+journalctl -r : reverse the output
+journalctl -p 2..5 : view logs from severity 2 to 5. 
+0:emerg
+1:alert
+2:crit
+3:err
+4:warning
+5:notice
+6:info
+7:debug
+
+journalctl -f : view logs as they arrive
+
+### User Management files
+
+The /etc/passwd file : maps usernames to user id's. 
+user + home directory = account
+Login name :Password(x indicates stored in shadow file):User ID:Group ID:Real name:Home directory:Shell
+
+eg juser:x:3119:1000:J. Random User:/home/juser:/bin/bash
+
+/etc/shadow : stores user authentication information eg encrypted passwds and their expiration information.  
+
+passwd : used to interact with the /etc/passwd file
+adduser , usedel : to create and delete users
+
+/etc/group : similar to passwd
+
+Group name:Password:Group ID:Additional users
+
+disk:*:6:juser,beazley
+
+getty : displays the login prompt in the terminal
+
+### Cron Jobs
+
+crontab : used to manage cron jobs
+
+Minute (0 through 59). This cron job is set for minute 15.
+Hour (0 through 23). This job is set for the ninth hour and 15th hour.
+Day of month (1 through 31).
+Month (1 through 12).
+Day of week (0 through 7). The numbers 0 and 7 are Sunday.
+
+` * means catch all`
+
+15 09,14 * * * /home/juser/bin/spmake
+
+at : command runs a job only once
+atq : checks if a command has been scheduled
+
+## Process and Resource Utilization
 
 
 
