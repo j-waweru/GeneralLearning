@@ -592,6 +592,67 @@ atq : checks if a command has been scheduled
 
 ## Process and Resource Utilization
 
+**refer heavily to the book**
+
+top - lists the most active processes (most cpu time by default)
+
+Spacebar  Updates the display immediately
+M  Sorts by current resident memory usage
+T  Sorts by total (cumulative) CPU usage
+P  Sorts by current CPU usage (the default)
+u  Displays only one user’s processes
+f  Selects different statistics to display
+?  Displays a usage summary for all top commands
+
+lsof - lists open files and processes associated with them 
+
+lsof +D /home :  
+lsof -p pid 
+
+### strace and ltrace
+
+strace ls
+Tracks system calls
+
+ltrace ls
+Tracks **shared** library calls
+Doesn't work on statically linked libs 
+
+### Threads
+
+ps m : dashes represent a thread . More than one dash is multithreaded
+
+ps m -o pid,tid,command
+
+ps -l : show the priority of a process (-20 highest to 20 for least)
+
+Nice value : next time slot for the process. A higher value makes the process take a backseat.
+
+renice 20 pid : adjusts the value of a process
+
+---
+
+/usr/bin/time ps : shows the page faults
+
+ps -o pid,min_flt,maj_flt 20365 : to view major and minor page faults
+
+---
+
+## Networks
+
+ip address show : show all network interfaces 
+
+ip route show 
+
+Default gateway is usually at addr 1 eg 198.0.0.1 
+
+---
+
+ping 10.1.1.1 : send icmp echo requests .
+
+host example.com : dns lookup bothways
+
+nmcli : manage the network manager from cli instead of the applet
 
 
 
