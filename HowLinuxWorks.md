@@ -654,6 +654,49 @@ host example.com : dns lookup bothways
 
 nmcli : manage the network manager from cli instead of the applet
 
+iptables 
+
+netstat 
+
+---
+
+## SSH
+
+ssh-keygen -t rsa -N '' -f /etc/ssh/ssh_host_rsa_key
+
+ssh_known_hosts : keyfile containing known public keys of all trusted clients 
+
+systemctl start sshd : start the ssh daemon 
+
+fail2ban : uses iptables to block repeated login requests and removes them after a specified time period
+
+ssh remote_username@remote_host : login to remote ssh client
+
+
+
+tar zcvf - dir | ssh remote_host tar zxvf -pipe to ssh
+
+
+scp user1@host1:file user2@host2:dir : the scp and sftp programs are used to send files to and from remote and local machines 
+
+
+lsof -i can also be used to view processes using ports
+lsof -iprotocol@host:port : looking for a particular port
+lsof -iTCP -sTCP:LISTEN : connection status
+
+tcpdump 
+
+netcat host port : netcat can connect to remote TCP/UDP ports, specify a local port, listen on ports, scan ports, redirect standard I/O to and from network connections etc.
+
+
+(Nmap) program scans all ports on a machine or network of machines looking for open ports, and it lists the ports it finds.
+
+nmap 10.1.2.2 : run a generic scan 
+
+Unix domain sockets : similar to network , better performance
+lsof -U : view them
+
+## Network file sharing 
 
 
 
