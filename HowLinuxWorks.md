@@ -696,8 +696,6 @@ nmap 10.1.2.2 : run a generic scan
 Unix domain sockets : similar to network , better performance
 lsof -U : view them
 
-## Network file sharing 
-
 
 
 
